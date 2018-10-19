@@ -130,6 +130,7 @@ def create_pull_request(repo, branch, addon_id, addon_info):
         headers={'Accept': 'application/vnd.github.v3+json'},
         auth=(gh_username, gh_token)
     )
+    print(resp.status_code)
     print(resp.json())
     if not resp.json():
         print('Submitting pull request...')
