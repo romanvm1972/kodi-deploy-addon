@@ -17,7 +17,7 @@ __all__ = [
 AddonInfo = namedtuple('AddonInfo', ['name', 'version', 'description', 'news'])
 
 REPO_URL_MASK = 'https://{gh_token}@github.com/{repo_slug}.git'
-PR_ENDPOINT = 'https://api.github.com/repos/romanvm/{}/pulls'
+PR_ENDPOINT = 'https://api.github.com/xbmc/{}/pulls'
 
 
 def clean_pyc(directory):
@@ -131,7 +131,7 @@ def create_pull_request(repo, branch, addon_id, addon_info):
         auth=(gh_username, gh_token)
     )
     print(resp.json())
-    if resp.status_code == 404:
+    if resp.status_code == 200 and not resp.json():
         print('Submitting pull request...')
         payload = {
             'title': '[{}] {}'.format(addon_id, addon_info.version),
@@ -152,12 +152,12 @@ def create_pull_request(repo, branch, addon_id, addon_info):
             )
         print('Pull request submitted successfully:')
         print(resp.text)
-    elif resp.status_code == 200:
+    elif resp.status_code == 200 and resp.json():
         print(
             'Pull request in {} for {}:{} already exists.'.format(
                 branch, gh_username, addon_id)
         )
     else:
         raise RuntimeError(
-            'GitHub returned error code: {}'.format(resp.status_code)
+            'Unexpected GitHub error: {}'.format(resp.status_code)
         )
